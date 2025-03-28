@@ -198,7 +198,8 @@ print(t_eval)
 # code chunk for Q4
 t_eval %>% 
   rename(sex = gender) %>% 
-  filter(no_participants > 10) 
+  filter(no_participants > 10) %>% 
+  
   
   
 ```
