@@ -66,17 +66,8 @@ Please don't do either of those things.
 
 -   The first chunk of this Quarto document should be used to *declare your libraries* (probably only `tidyverse` for now)
 
-```{r setup}
-#| label: setup
-library(tidyr)
-
-```
 
 -   The second chunk of your Quarto document should be to *load in your data*.
-```{r load data}
-#| label: load data
-read.csv("data_raw/teacher_evals.csv")
-```
 
 
 ## Save Regularly, Render Often
@@ -157,7 +148,8 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: setup
 # code chunk for loading packages
-
+library(tidyverse)
+library(janitor)
 ```
 
 **2. Load in the `teacher_evals` data.** 
@@ -165,7 +157,7 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: load-data
 # code chunk for importing the data
-
+read.csv("data_raw/teacher_evals.csv")
 ```
 
 ### Data Inspection + Summary
@@ -175,16 +167,22 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: explore-data
 # you may want to use code to answer this question
+t_eval <- read.csv("data_raw/teacher_evals.csv")
+glimpse(t_eval)
 
 ```
+> There are 8,015 rows and 22 columns in our dataset. I also notice that some of the columns have capital letters in the variable names, which means we will have to use the janitor package to make them all lowercase and easier to work with. Additionally, we have various character and integer, and double types of data in our data set. The class duration column shows only the number 0 in the observations, which stands out to me which means that we may have to replace the zeros with NAs.
 
 **4. What is the unit of observation (i.e. a single row in the dataset) identified by?**
 
 ```{r}
 #| label: row-identification
 # you may want to use code to answer this question
+glimpse(t_eval)
 
+print(t_eval)
 ```
+> The unit of observation is identified by the variable type, such as <chr>, <dbl>, and <int>.
 
 **5. Use _one_ `dplyr` pipeline to clean the data by:**
 
@@ -198,7 +196,11 @@ included in the `teacher_evals_codebook.pdf`.
 ```{r}
 #| label: data-cleaning
 # code chunk for Q4
-
+t_eval %>% 
+  rename(sex = gender) %>% 
+  filter(no_participants > 10) 
+  
+  
 ```
 
 **6. How many unique instructors and unique courses are present in the cleaned dataset?**
