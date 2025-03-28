@@ -64,8 +64,20 @@ Please don't do either of those things.
 
 ## Setting Up Your Code Chunks
 
--   The first chunk of this Quarto document should be used to *declare your libraries* (probably only `tidyverse` for now).
+-   The first chunk of this Quarto document should be used to *declare your libraries* (probably only `tidyverse` for now)
+
+```{r setup}
+#| label: setup
+library(tidyr)
+
+```
+
 -   The second chunk of your Quarto document should be to *load in your data*.
+```{r load data}
+#| label: load data
+read.csv("data_raw/teacher_evals.csv")
+```
+
 
 ## Save Regularly, Render Often
 
