@@ -2,6 +2,12 @@
 title: "lab-5-student"
 author: "Efrain Ramirez"
 format: html
+editor: source
+embed-resources: true
+code-tools: true
+execute: 
+  eval: false
+  echo: true
 ---
 
 In this lab, we will be using the `dplyr` package to explore student evaluations
@@ -169,7 +175,6 @@ read.csv("data_raw/teacher_evals.csv")
 # you may want to use code to answer this question
 t_eval <- read.csv("data_raw/teacher_evals.csv")
 glimpse(t_eval)
-
 ```
 > There are 8,015 rows and 22 columns in our dataset. I also notice that some of the columns have capital letters in the variable names, which means we will have to use the janitor package to make them all lowercase and easier to work with. Additionally, we have various character and integer, and double types of data in our data set. The class duration column shows only the number 0 in the observations, which stands out to me which means that we may have to replace the zeros with NAs.
 
@@ -196,43 +201,67 @@ print(t_eval)
 ```{r}
 #| label: data-cleaning
 # code chunk for Q4
-t_eval %>% 
+teacher_evals_clean <- t_eval %>% 
   rename(sex = gender) %>% 
-  filter(no_participants > 10) %>% 
-  
-  
-  
+  filter(-no_participants < 10) %>% 
+  select(course_id, teacher_id, question_no, no_participants, resp_share, SET_score_avg, percent_failed_cur, academic_degree, seniority, sex) %>% 
+  mutate(teacher_id = as.integer(teacher_id))
+
+#Save the data as `teacher_evals_clean.csv` in the `data-clean` folder
+#write.csv(teacher_evals_clean, "C:/Users/efrai/Documents/STAT_210_Spring_2025/Labs/Original/Lab-5-efrain-ramirez/Lab-5-TE/data_clean/teacher_evals_clean.csv")
 ```
 
 **6. How many unique instructors and unique courses are present in the cleaned dataset?**
+> There are 308 unique instructors and 1053 unique courses present in the cleaned dataset.
 
 ```{r}
 #| label: unique-courses
 # code chunk for Q5
+teacher_evals_clean %>% 
+  distinct(teacher_id) #308 unique instructors are present
 
+teacher_evals_clean %>% 
+  distinct(course_id) #1053 unique courses are present
+print(teacher_evals_clean)
 ```
 
 **7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**
+
+>I honestly had the toughest trying to figure out how to find the NAs in the dateset through the use of dplyr functions that I had to move on to the other questions. I spent about 3 hours trying to figure this one out.
 
 ```{r}
 #| label: uncovering-missing-values
 # code chunk for Q6
 
+# I honestly had the hardest time being able to find this one.
 ```
 
 **8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**
 
+> The demographics of the instructors in this study were: academic_degree; no_dgr, ma, dr, and prof. Meaning that no_dgr was no degree, ma was Masters, dr was a Doctorate, and prof, meant that they were a professor, which was strange to me that it would be under the list of academic degrees. As for seniority, this had to do with the number of years that instructors had been instructors for at the university. Lastly, the variable of sex was determined by self-reported answer of either Male or Female by the respondent.
+
 ```{r}
 #| label: exploring-demographics-of-instructors
 # code chunk for Q7
+unique(teacher_evals_clean$academic_degree)
 
+unique(teacher_evals_clean$seniority)
+
+unique(teacher_evals_clean$sex)
 ```
 
 **9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**
 
+> The amount of teacher-course combinations were a total of 882 that asked all nine questions.
+
 ```{r}
 #| label: teacher-course-asked-every-question
 # code chunk for Q8
+print(teacher_evals_clean) 
+
+teacher_evals_clean %>% 
+  select(course_id, teacher_id, question_no) %>% 
+  filter(question_no == 909) 
 
 ```
 
@@ -240,24 +269,40 @@ t_eval %>%
 
 **10. Which instructors had the highest and lowest average rating for Question 1 (I learnt a lot during the course.) across all their courses?**
 
+> The instructor with teacher_id: 54655 had the highest with an average of 4.22 on the SET_score_avg, while the instructor with teacher_id: 100132 had the lowest average with a score of 1.0 on the SET_score_avg. 
+
 ```{r}
 #| label: question-1-high-low
 # code chunk for Q9
-
+teacher_evals_clean %>% 
+  select(teacher_id, question_no, SET_score_avg ) %>% 
+  arrange(SET_score_avg) %>% 
+  filter(question_no == 901)
 ```
 
 **11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**
 
+> The instructor with one year of experience that had the highest average percentage of students failing their current semester across all their courses is teacher_id: 104362, while the instructor with one year of experience that had the lowest average percentage of students failing their current semester across all their courses is teacher_id: 98650, but also 104362.
+
 ```{r}
 #| label: one-year-experience-failing-students
 # code chunk for Q10
-
+teacher_evals_clean %>% 
+  select(teacher_id, seniority, percent_failed_cur) %>% 
+  arrange(percent_failed_cur) %>% 
+  filter(seniority == 1)
 ```
 
 **12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**
+
+> The female instructors with either a doctorate or a professional degree that had the highest average percent of students responding to the evaluation across all their courses were instructors with the teacher_id : 104362 and 57131. The female instructors with either a doctorate or a professional degree that had the lowest average percent of students responding to the evaluation across all their courses were instructors with the teacher_id: 3485, and 59338.
 
 ```{r}
 #| label: female-instructor-student-response
 # code chunk for Q11
 
+teacher_evals_clean %>% 
+  select(teacher_id, academic_degree, resp_share, sex) %>% 
+  arrange(resp_share) %>% 
+  filter(sex == "female")
 ```
